@@ -1,13 +1,8 @@
 const board = document.getElementById('weather');
 const API = '455bdd01213a436b9d195824230111';
 const LOCAL_STORAGE_WEATHER_KEY = 'weather.list';
-const LOCAL_STORAGE_FORECAST_KEY = 'weather.forecast';
 let weatherLists = JSON.parse(
   localStorage.getItem(LOCAL_STORAGE_WEATHER_KEY) || '[]'
-);
-
-let forecastWeatherLists = JSON.parse(
-  localStorage.getItem(LOCAL_STORAGE_FORECAST_KEY) || '[]'
 );
 
 function currentDate() {
@@ -42,75 +37,6 @@ function currentDate() {
   return currenDate;
 }
 
-function currentDay() {
-  const daysOfWeek = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
-
-  const today = new Date();
-  const dayOfWeek = daysOfWeek[today.getDay()];
-
-  return dayOfWeek;
-}
-
-async function getForecastWeather(userInput) {
-  try {
-    const forecastWeather = await fetch(
-      `https://api.weatherapi.com/v1/forecast.json?key=${API}&q=${userInput}&days=4&hour=9`,
-      { mode: 'cors' }
-    );
-    const forecastWeatherJson = await forecastWeather.json();
-    const readyToUseJson = forecastWeatherFunction(forecastWeatherJson);
-    forecastWeatherLists.push(readyToUseJson);
-    forecastWeatherLists = forecastWeatherLists.filter(
-      (item) => item.id === readyToUseJson.id
-    );
-    saveAndRender();
-  } catch (error) {
-    return error;
-  }
-}
-
-function forecastWeatherFunction(Json) {
-  const { name } = Json.location;
-  const day1 = Json.forecast.forecastday[0].date;
-  const day2 = Json.forecast.forecastday[1].date;
-  const day3 = Json.forecast.forecastday[2].date;
-  const day4 = Json.forecast.forecastday[3].date;
-  const icon1 = Json.forecast.forecastday[0].day.condition.icon;
-  const icon2 = Json.forecast.forecastday[1].day.condition.icon;
-  const icon3 = Json.forecast.forecastday[2].day.condition.icon;
-  const icon4 = Json.forecast.forecastday[3].day.condition.icon;
-  const temp1 = Json.forecast.forecastday[0].day.avgtemp_c;
-  const temp2 = Json.forecast.forecastday[1].day.avgtemp_c;
-  const temp3 = Json.forecast.forecastday[2].day.avgtemp_c;
-  const temp4 = Json.forecast.forecastday[3].day.avgtemp_c;
-  const id = Date.now().toString();
-
-  return {
-    name,
-    day1,
-    day2,
-    day3,
-    day4,
-    icon1,
-    icon2,
-    icon3,
-    icon4,
-    temp1,
-    temp2,
-    temp3,
-    temp4,
-    id,
-  };
-}
-
 function getDayFromDate(dateInput) {
   const date = new Date(dateInput);
   const options = { weekday: 'long' };
@@ -118,12 +44,11 @@ function getDayFromDate(dateInput) {
 
   return day.slice(0, 3);
 }
-// Output: Saturday
 
 async function getCurrentWeather(userInput) {
   try {
     const weather = await fetch(
-      `https://api.weatherapi.com/v1/current.json?key=${API}&q=${userInput}`,
+      `https://api.weatherapi.com/v1/forecast.json?key=${API}&q=${userInput}&days=4&hour=9`,
       { mode: 'cors' }
     );
     const weatherJson = await weather.json();
@@ -131,6 +56,7 @@ async function getCurrentWeather(userInput) {
     weatherLists.push(readyToUseJson);
     weatherLists = weatherLists.filter((item) => item.id === readyToUseJson.id);
     saveAndRender();
+    return readyToUseJson;
   } catch (error) {
     return error;
   }
@@ -145,6 +71,34 @@ function currentWeather(Json) {
   const wind = Json.current.wind_kph;
   const feelslike = Json.current.feelslike_c;
   const id = Date.now().toString();
+  const day1 = Json.forecast.forecastday[0].date;
+  const day2 = Json.forecast.forecastday[1].date;
+  const day3 = Json.forecast.forecastday[2].date;
+  const day4 = Json.forecast.forecastday[3].date;
+  const icon1 = Json.current.condition.icon;
+  const icon2 = Json.forecast.forecastday[1].day.condition.icon;
+  const icon3 = Json.forecast.forecastday[2].day.condition.icon;
+  const icon4 = Json.forecast.forecastday[3].day.condition.icon;
+  const temp1 = Json.current.temp_c;
+  const temp2 = Json.forecast.forecastday[1].day.avgtemp_c;
+  const temp3 = Json.forecast.forecastday[2].day.avgtemp_c;
+  const temp4 = Json.forecast.forecastday[3].day.avgtemp_c;
+  const filselike1 = Json.current.feelslike_c;
+  const filselike2 = Json.forecast.forecastday[1].day.avgtemp_c;
+  const filselike3 = Json.forecast.forecastday[2].day.avgtemp_c;
+  const filselike4 = Json.forecast.forecastday[3].day.avgtemp_c;
+  const wind1 = Json.current.wind_kph;
+  const wind2 = Json.forecast.forecastday[1].day.avgtemp_c;
+  const wind3 = Json.forecast.forecastday[2].day.avgtemp_c;
+  const wind4 = Json.forecast.forecastday[3].day.avgtemp_c;
+  const humidity1 = Json.current.humidity;
+  const humidity2 = Json.forecast.forecastday[1].hour[0].humidity;
+  const humidity3 = Json.forecast.forecastday[2].hour[0].humidity;
+  const humidity4 = Json.forecast.forecastday[3].hour[0].humidity;
+  const condition1 = Json.current.condition.text;
+  const condition2 = Json.forecast.forecastday[1].day.condition.text;
+  const condition3 = Json.forecast.forecastday[2].day.condition.text;
+  const condition4 = Json.forecast.forecastday[3].day.condition.text;
   return {
     country,
     city,
@@ -154,15 +108,39 @@ function currentWeather(Json) {
     humidity,
     wind,
     feelslike,
+    day1,
+    day2,
+    day3,
+    day4,
+    icon1,
+    icon2,
+    icon3,
+    icon4,
+    temp1,
+    temp2,
+    temp3,
+    temp4,
+    filselike1,
+    filselike2,
+    filselike3,
+    filselike4,
+    wind1,
+    wind2,
+    wind3,
+    wind4,
+    humidity1,
+    humidity2,
+    humidity3,
+    humidity4,
+    condition1,
+    condition2,
+    condition3,
+    condition4,
     id,
   };
 }
 
 function saveAndRender() {
-  localStorage.setItem(
-    LOCAL_STORAGE_FORECAST_KEY,
-    JSON.stringify(forecastWeatherLists)
-  );
   localStorage.setItem(LOCAL_STORAGE_WEATHER_KEY, JSON.stringify(weatherLists));
   renderWeather();
 }
@@ -173,13 +151,7 @@ function clearList(element) {
   }
 }
 
-function renderWeather() {
-  // board.innerHTML = '';
-  if (weatherLists.length === 0) {
-    return;
-  }
-  clearList(board);
-  // ! start of right top
+function rightContentRender() {
   const right = document.createElement('div');
   right.classList.add('right');
   const rightTop = document.createElement('div');
@@ -208,52 +180,41 @@ function renderWeather() {
   const otherDays = document.createElement('div');
   otherDays.classList.add('other-days');
 
-  const choose = document.createElement('div');
-  choose.classList.add('choose', 'choosen');
+  for (let i = 1; i < 5; i += 1) {
+    const choose = document.createElement('div');
+    if (i === 1) {
+      choose.classList.add('choosen');
+    }
+    choose.classList.add('choose');
+    choose.textContent = getDayFromDate(weatherLists[0][`day${i}`]);
+    choose.id = i;
+    const temp = document.createElement('div');
+    temp.classList.add('temp');
+    temp.textContent = `${weatherLists[0][`temp${i}`]}°C`;
+    const forecastImage = document.createElement('img');
+    forecastImage.classList.add('right-icon');
+    forecastImage.src = weatherLists[0][`icon${i}`];
 
-  choose.textContent = getDayFromDate(forecastWeatherLists[0].day1);
-  const temp = document.createElement('div');
-  temp.classList.add('temp');
-  temp.textContent = forecastWeatherLists[0].temp1;
+    choose.appendChild(forecastImage);
+    choose.appendChild(temp);
+    otherDays.appendChild(choose);
+  }
+  console.log(otherDays);
 
-  const forecastImage = document.createElement('img');
-  forecastImage.classList.add('right-icon');
-  forecastImage.src = forecastWeatherLists[0].icon1;
-  choose.appendChild(forecastImage);
-  choose.appendChild(temp);
-  otherDays.appendChild(choose);
-  const choose2 = document.createElement('div');
-  choose2.classList.add('choose');
-  choose2.textContent = getDayFromDate(forecastWeatherLists[0].day2);
-  const temp2 = document.createElement('div');
-  temp2.classList.add('temp');
-  temp2.textContent = forecastWeatherLists[0].temp2;
-  const forecastImage2 = document.createElement('img');
-  forecastImage2.classList.add('right-icon');
-  forecastImage2.src = forecastWeatherLists[0].icon2;
-  choose2.appendChild(forecastImage2);
-  choose2.appendChild(temp2);
-  otherDays.appendChild(choose2);
-  const choose3 = document.createElement('div');
-  choose3.classList.add('choose');
-  choose3.textContent = getDayFromDate(forecastWeatherLists[0].day3);
-  const temp3 = document.createElement('div');
-  temp3.classList.add('temp');
-  temp3.textContent = forecastWeatherLists[0].temp3;
-  const forecastImage3 = document.createElement('img');
-  forecastImage3.classList.add('right-icon');
-  forecastImage3.src = forecastWeatherLists[0].icon3;
-  choose3.appendChild(forecastImage3);
-  const choose4 = document.createElement('div');
-  choose4.classList.add('choose');
-  choose4.textContent = getDayFromDate(forecastWeatherLists[0].day4);
-  const temp4 = document.createElement('div');
-  temp4.classList.add('temp');
-  temp4.textContent = forecastWeatherLists[0].temp4;
-  const forecastImage4 = document.createElement('img');
-  forecastImage4.classList.add('right-icon');
-  forecastImage4.src = forecastWeatherLists[0].icon4;
-  choose4.appendChild(forecastImage4);
+  otherDays.addEventListener('click', (e) => {
+    console.log(e.target.id);
+    const { childNodes } = otherDays;
+    const choosenClass = 'choosen';
+
+    for (let i = 0; i < childNodes.length; i++) {
+      if (e.target.id === `${i + 1}`) {
+        childNodes[i].classList.add(choosenClass);
+      } else {
+        childNodes[i].classList.remove(choosenClass);
+      }
+    }
+  });
+
   const form = document.createElement('form');
   form.classList.add('form');
   const input = document.createElement('input');
@@ -264,6 +225,45 @@ function renderWeather() {
   btn.classList.add('button', 'right-btn');
   btn.innerHTML = 'Choose location';
 
+  form.appendChild(input);
+  form.appendChild(btn);
+  feelslike.appendChild(valueOfFeelslike);
+  humidity.appendChild(valueOfHumidity);
+  wind.appendChild(valueOfWind);
+  rightTop.appendChild(humidity);
+  rightTop.appendChild(wind);
+  rightTop.appendChild(feelslike);
+  rightBottom.appendChild(otherDays);
+  right.appendChild(rightTop);
+  right.appendChild(rightBottom);
+  right.appendChild(form);
+
+  let counter = 0;
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!counter) {
+      btn.classList.toggle('right-btn-after-click');
+      btn.innerHTML = '<i class="fi fi-rr-search"></i>';
+      counter = 1;
+    } else {
+      new Promise((resolve) => {
+        e.preventDefault();
+        resolve(input.value);
+      })
+        .then((city) => {
+          getCurrentWeather(city);
+        })
+        .catch((error) => error);
+      input.value = '';
+      counter = 0;
+      btn.classList.toggle('right-btn-after-click');
+      btn.innerHTML = 'Choose location';
+    }
+  });
+  return right;
+}
+
+function leftContentRender() {
   const left = document.createElement('div');
   left.classList.add('left');
   const leftTop = document.createElement('div');
@@ -272,7 +272,7 @@ function renderWeather() {
   dayDate.classList.add('dayDate');
   const day = document.createElement('div');
   day.classList.add('day');
-  day.textContent = currentDay();
+  day.textContent = getDayFromDate(weatherLists[0].day1);
   const date = document.createElement('div');
   date.classList.add('date');
   date.textContent = currentDate();
@@ -293,23 +293,6 @@ function renderWeather() {
   condition.classList.add('condition');
   condition.textContent = `${weatherLists[0].condition}`;
 
-  form.appendChild(input);
-  form.appendChild(btn);
-  choose3.appendChild(temp3);
-  choose4.appendChild(temp4);
-  otherDays.appendChild(choose3);
-  otherDays.appendChild(choose4);
-  feelslike.appendChild(valueOfFeelslike);
-  humidity.appendChild(valueOfHumidity);
-  wind.appendChild(valueOfWind);
-  rightTop.appendChild(humidity);
-  rightTop.appendChild(wind);
-  rightTop.appendChild(feelslike);
-  rightBottom.appendChild(otherDays);
-  right.appendChild(rightTop);
-  right.appendChild(rightBottom);
-  right.appendChild(form);
-
   dayDate.appendChild(day);
   dayDate.appendChild(date);
   leftTop.appendChild(dayDate);
@@ -319,41 +302,16 @@ function renderWeather() {
   left.appendChild(leftTop);
   left.appendChild(image);
   left.appendChild(leftBottom);
+  return left;
+}
+function renderWeather() {
+  clearList(board);
+  // ! start of right top
+  const right = rightContentRender();
+  const left = leftContentRender();
   board.appendChild(right);
   board.appendChild(left);
-  let counter = 0;
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!counter) {
-      btn.classList.toggle('right-btn-after-click');
-      btn.innerHTML = '<i class="fi fi-rr-search"></i>';
-      counter = 1;
-    } else {
-      new Promise((resolve) => {
-        e.preventDefault();
-        resolve(input.value);
-      })
-        .then((city) => {
-          runWeather(city);
-        })
-        .catch((error) => error);
-      input.value = '';
-      counter = 0;
-      btn.classList.toggle('right-btn-after-click');
-      btn.innerHTML = 'Choose location';
-    }
-  });
 }
 
-async function runWeather(location) {
-  // let locationInput = location;
-  // if (!locationInput && !weatherLists.length) {
-  //   locationInput = 'Tashkent';
-  // } else {
-  //   locationInput = weatherLists[0].city;
-  // }
-  await getCurrentWeather(location);
-  await getForecastWeather(location);
-}
-runWeather('dushanbe');
-runWeather(weatherLists[0].city);
+getCurrentWeather('dushanbe');
+getCurrentWeather(weatherLists[0].city);

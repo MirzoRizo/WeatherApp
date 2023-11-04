@@ -3,5 +3,5 @@
     "source.fixAll.eslint": true
   },
   "eslint.validate": ["javascript"],
-  "cSpell.ignoreWords": ["feelslike", "forecastday"]
+  "cSpell.ignoreWords": ["choosen", "feelslike", "forecastday"]
 }
