@@ -2,10 +2,12 @@ const board = document.getElementById('weather');
 const API = '455bdd01213a436b9d195824230111';
 const LOCAL_STORAGE_WEATHER_KEY = 'weather.list';
 const LOCAL_STORAGE_FORECAST_KEY = 'weather.forecast';
-let weatherLists = JSON.parse(localStorage.getItem(LOCAL_STORAGE_WEATHER_KEY));
+let weatherLists = JSON.parse(
+  localStorage.getItem(LOCAL_STORAGE_WEATHER_KEY) || '[]'
+);
 
 let forecastWeatherLists = JSON.parse(
-  localStorage.getItem(LOCAL_STORAGE_FORECAST_KEY) || []
+  localStorage.getItem(LOCAL_STORAGE_FORECAST_KEY) || '[]'
 );
 
 function currentDate() {
@@ -343,8 +345,15 @@ function renderWeather() {
   });
 }
 
-function runWeather(location) {
-  getCurrentWeather(location);
-  getForecastWeather(location);
+async function runWeather(location) {
+  // let locationInput = location;
+  // if (!locationInput && !weatherLists.length) {
+  //   locationInput = 'Tashkent';
+  // } else {
+  //   locationInput = weatherLists[0].city;
+  // }
+  await getCurrentWeather(location);
+  await getForecastWeather(location);
 }
-runWeather(weatherLists[0].city || 'London');
+runWeather('dushanbe');
+runWeather(weatherLists[0].city);
