@@ -1,40 +1,51 @@
 const board = document.getElementById('weather');
+const cardHolder = document.querySelector('.other-days');
+const rightTop = document.querySelector('.right-top');
+const right = document.querySelector('.right');
+const btn = document.querySelector('.button');
+const input = document.getElementById('city');
+const left = document.querySelector('.left');
 const API = '455bdd01213a436b9d195824230111';
 const LOCAL_STORAGE_WEATHER_KEY = 'weather.list';
+const LOCAL_STORAGE_SELECTED_LIST_ID_KEY = 'weather.selectedListId';
 let weatherLists = JSON.parse(
   localStorage.getItem(LOCAL_STORAGE_WEATHER_KEY) || '[]'
 );
+let selectedListId = localStorage.getItem(LOCAL_STORAGE_SELECTED_LIST_ID_KEY);
+const now = new Date();
+const currentHour = now.getHours();
 
-function currentDate() {
-  const months = {
-    1: 'Jan',
-    2: 'Feb',
-    3: 'Mar',
-    4: 'Apr',
-    5: 'May',
-    6: 'Jun',
-    7: 'Jul',
-    8: 'Aug',
-    9: 'Sep',
-    10: 'Oct',
-    11: 'Nov',
-    12: 'Dec',
-  };
-
-  const today = new Date();
-  let date = today.getDate();
-  let month = today.getMonth() + 1; // January is 0
-  const year = today.getFullYear();
-
-  if (date < 10) {
-    date = `0${date}`;
+let counter = 0;
+btn.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (!counter) {
+    btn.classList.toggle('right-btn-after-click');
+    btn.innerHTML = '<i class="fi fi-rr-search"></i>';
+    counter = 1;
+  } else {
+    getCurrentWeather(input.value);
+    counter = 0;
+    input.value = '';
+    btn.classList.toggle('right-btn-after-click');
+    btn.innerHTML = 'Choose location';
+    selectedListId = 0;
   }
-  if (month < 10) {
-    month = `0${month}`;
-  }
+});
 
-  const currenDate = `${date} ${months[month]} ${year}`;
-  return currenDate;
+cardHolder.addEventListener('click', (e) => {
+  selectedListId = e.target.id;
+  saveAndRender();
+});
+
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(
+    date
+  );
+  const year = date.getFullYear();
+  const formattedDate = `${day} ${month} ${year}`;
+  return formattedDate;
 }
 
 function getDayFromDate(dateInput) {
@@ -48,101 +59,45 @@ function getDayFromDate(dateInput) {
 async function getCurrentWeather(userInput) {
   try {
     const weather = await fetch(
-      `https://api.weatherapi.com/v1/forecast.json?key=${API}&q=${userInput}&days=4&hour=9`,
+      `https://api.weatherapi.com/v1/forecast.json?key=${API}&q=${userInput}&days=4&hour=${currentHour}`,
       { mode: 'cors' }
     );
     const weatherJson = await weather.json();
-    const readyToUseJson = currentWeather(weatherJson);
-    weatherLists.push(readyToUseJson);
-    weatherLists = weatherLists.filter((item) => item.id === readyToUseJson.id);
+    for (let i = 0; i < 4; i++) {
+      const list = createList(weatherJson, i);
+      const fullList = createFull(weatherJson, i);
+      list.full = fullList;
+      weatherLists.push(list);
+    }
+    weatherLists = weatherLists.slice(-4);
     saveAndRender();
-    return readyToUseJson;
   } catch (error) {
-    return error;
+    alert('City not found');
   }
 }
-function currentWeather(Json) {
-  const { country } = Json.location;
-  const city = Json.location.name;
-  const temp = Json.current.temp_c;
-  const condition = Json.current.condition.text;
-  const { icon } = Json.current.condition;
-  const { humidity } = Json.current; // * Влажность воздуха
-  const wind = Json.current.wind_kph;
-  const feelslike = Json.current.feelslike_c;
-  const id = Date.now().toString();
-  const day1 = Json.forecast.forecastday[0].date;
-  const day2 = Json.forecast.forecastday[1].date;
-  const day3 = Json.forecast.forecastday[2].date;
-  const day4 = Json.forecast.forecastday[3].date;
-  const icon1 = Json.current.condition.icon;
-  const icon2 = Json.forecast.forecastday[1].day.condition.icon;
-  const icon3 = Json.forecast.forecastday[2].day.condition.icon;
-  const icon4 = Json.forecast.forecastday[3].day.condition.icon;
-  const temp1 = Json.current.temp_c;
-  const temp2 = Json.forecast.forecastday[1].day.avgtemp_c;
-  const temp3 = Json.forecast.forecastday[2].day.avgtemp_c;
-  const temp4 = Json.forecast.forecastday[3].day.avgtemp_c;
-  const filselike1 = Json.current.feelslike_c;
-  const filselike2 = Json.forecast.forecastday[1].day.avgtemp_c;
-  const filselike3 = Json.forecast.forecastday[2].day.avgtemp_c;
-  const filselike4 = Json.forecast.forecastday[3].day.avgtemp_c;
-  const wind1 = Json.current.wind_kph;
-  const wind2 = Json.forecast.forecastday[1].day.avgtemp_c;
-  const wind3 = Json.forecast.forecastday[2].day.avgtemp_c;
-  const wind4 = Json.forecast.forecastday[3].day.avgtemp_c;
-  const humidity1 = Json.current.humidity;
-  const humidity2 = Json.forecast.forecastday[1].hour[0].humidity;
-  const humidity3 = Json.forecast.forecastday[2].hour[0].humidity;
-  const humidity4 = Json.forecast.forecastday[3].hour[0].humidity;
-  const condition1 = Json.current.condition.text;
-  const condition2 = Json.forecast.forecastday[1].day.condition.text;
-  const condition3 = Json.forecast.forecastday[2].day.condition.text;
-  const condition4 = Json.forecast.forecastday[3].day.condition.text;
+
+function createList(Json, num) {
   return {
-    country,
-    city,
-    temp,
-    condition,
-    icon,
-    humidity,
-    wind,
-    feelslike,
-    day1,
-    day2,
-    day3,
-    day4,
-    icon1,
-    icon2,
-    icon3,
-    icon4,
-    temp1,
-    temp2,
-    temp3,
-    temp4,
-    filselike1,
-    filselike2,
-    filselike3,
-    filselike4,
-    wind1,
-    wind2,
-    wind3,
-    wind4,
-    humidity1,
-    humidity2,
-    humidity3,
-    humidity4,
-    condition1,
-    condition2,
-    condition3,
-    condition4,
-    id,
+    id: num,
+    icon: Json.forecast.forecastday[num].hour[0].condition.icon,
+    date: Json.forecast.forecastday[num].date,
+    temp: Json.forecast.forecastday[num].hour[0].temp_c,
+    full: {},
   };
 }
-
-function saveAndRender() {
-  localStorage.setItem(LOCAL_STORAGE_WEATHER_KEY, JSON.stringify(weatherLists));
-  renderWeather();
+function createFull(Json, num) {
+  return {
+    id: Date.now().toString(),
+    humidity: Json.forecast.forecastday[num].hour[0].humidity,
+    wind: Json.forecast.forecastday[num].hour[0].wind_kph,
+    feelslike: Json.forecast.forecastday[num].hour[0].feelslike_c,
+    date: Json.forecast.forecastday[num].date,
+    city: Json.location.name,
+    country: Json.location.country,
+    icon: Json.forecast.forecastday[num].hour[0].condition.icon,
+    temp: Json.forecast.forecastday[num].hour[0].temp_c,
+    condition: Json.forecast.forecastday[num].hour[0].condition.text,
+  };
 }
 
 function clearList(element) {
@@ -151,167 +106,113 @@ function clearList(element) {
   }
 }
 
-function rightContentRender() {
-  const right = document.createElement('div');
-  right.classList.add('right');
-  const rightTop = document.createElement('div');
-  rightTop.classList.add('right-top');
-  const humidity = document.createElement('div');
-  humidity.classList.add('humidity');
-  humidity.textContent = 'Humidity';
-  const valueOfHumidity = document.createElement('div');
-  valueOfHumidity.classList.add('value');
-  valueOfHumidity.textContent = `${weatherLists[0].humidity}%`;
-  const wind = document.createElement('div');
-  wind.classList.add('wind');
-  wind.textContent = 'Wind';
-  const valueOfWind = document.createElement('div');
-  valueOfWind.classList.add('value');
-  valueOfWind.textContent = `${weatherLists[0].wind} km/h`;
-  const feelslike = document.createElement('div');
-  feelslike.classList.add('feelslike');
-  feelslike.textContent = 'Feels like';
-  const valueOfFeelslike = document.createElement('div');
-  valueOfFeelslike.classList.add('value');
-  valueOfFeelslike.textContent = `${weatherLists[0].feelslike}°C`;
-  // ! end of right top
-  const rightBottom = document.createElement('div');
-  rightBottom.classList.add('right-bottom');
-  const otherDays = document.createElement('div');
-  otherDays.classList.add('other-days');
+function save() {
+  localStorage.setItem(LOCAL_STORAGE_WEATHER_KEY, JSON.stringify(weatherLists));
+  localStorage.setItem(LOCAL_STORAGE_SELECTED_LIST_ID_KEY, selectedListId);
+}
 
-  for (let i = 1; i < 5; i += 1) {
-    const choose = document.createElement('div');
-    if (i === 1) {
-      choose.classList.add('choosen');
-    }
-    choose.classList.add('choose');
-    choose.textContent = getDayFromDate(weatherLists[0][`day${i}`]);
-    choose.id = i;
+function saveAndRender() {
+  save();
+  renderCard();
+}
+
+function renderCard() {
+  clearList(cardHolder);
+  weatherLists.forEach((list) => {
+    const dayChanger = document.createElement('div');
+
+    dayChanger.id = list.id;
+    dayChanger.classList.add('choose');
+    dayChanger.innerText = getDayFromDate(list.date);
+    const icon = document.createElement('img');
+    icon.src = list.icon;
+    icon.classList.add('right-icon');
+    icon.id = list.id;
     const temp = document.createElement('div');
     temp.classList.add('temp');
-    temp.textContent = `${weatherLists[0][`temp${i}`]}°C`;
-    const forecastImage = document.createElement('img');
-    forecastImage.classList.add('right-icon');
-    forecastImage.src = weatherLists[0][`icon${i}`];
-
-    choose.appendChild(forecastImage);
-    choose.appendChild(temp);
-    otherDays.appendChild(choose);
-  }
-  console.log(otherDays);
-
-  otherDays.addEventListener('click', (e) => {
-    console.log(e.target.id);
-    const { childNodes } = otherDays;
-    const choosenClass = 'choosen';
-
-    for (let i = 0; i < childNodes.length; i++) {
-      if (e.target.id === `${i + 1}`) {
-        childNodes[i].classList.add(choosenClass);
-      } else {
-        childNodes[i].classList.remove(choosenClass);
-      }
+    temp.innerText = `${list.temp}°C`;
+    if (list.id === +selectedListId) {
+      dayChanger.classList.add('choosen');
     }
+
+    dayChanger.appendChild(icon);
+    dayChanger.appendChild(temp);
+    cardHolder.append(dayChanger);
   });
+  const selectedList = weatherLists.find((list) => list.id === +selectedListId);
 
-  const form = document.createElement('form');
-  form.classList.add('form');
-  const input = document.createElement('input');
-  input.id = 'city';
-  input.type = 'text';
-  input.placeholder = 'Enter a city';
-  const btn = document.createElement('button');
-  btn.classList.add('button', 'right-btn');
-  btn.innerHTML = 'Choose location';
+  renderFull(selectedList.full);
+  LeftRender(selectedList.full);
+}
+// renderCard();
 
-  form.appendChild(input);
-  form.appendChild(btn);
-  feelslike.appendChild(valueOfFeelslike);
-  humidity.appendChild(valueOfHumidity);
-  wind.appendChild(valueOfWind);
+function renderFull(list) {
+  clearList(rightTop);
+
+  const humidity = document.createElement('div');
+  humidity.classList.add('humidity');
+  humidity.innerText = 'Humidity';
+  const humidityValue = document.createElement('div');
+  humidityValue.classList.add('value');
+  humidityValue.innerText = `${list.humidity}%`;
+  const wind = document.createElement('div');
+  wind.innerText = 'Wind';
+  wind.classList.add('wind');
+  const windValue = document.createElement('div');
+  windValue.classList.add('value');
+  windValue.innerText = `${list.wind} km/h`;
+  const feelslike = document.createElement('div');
+  feelslike.innerText = 'Feels like';
+  feelslike.classList.add('feelslike');
+  const feelslikeValue = document.createElement('div');
+  feelslikeValue.classList.add('value');
+  feelslikeValue.innerText = `${list.feelslike}°C`;
+  humidity.appendChild(humidityValue);
+  wind.appendChild(windValue);
+  feelslike.appendChild(feelslikeValue);
   rightTop.appendChild(humidity);
   rightTop.appendChild(wind);
   rightTop.appendChild(feelslike);
-  rightBottom.appendChild(otherDays);
-  right.appendChild(rightTop);
-  right.appendChild(rightBottom);
-  right.appendChild(form);
-
-  let counter = 0;
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!counter) {
-      btn.classList.toggle('right-btn-after-click');
-      btn.innerHTML = '<i class="fi fi-rr-search"></i>';
-      counter = 1;
-    } else {
-      new Promise((resolve) => {
-        e.preventDefault();
-        resolve(input.value);
-      })
-        .then((city) => {
-          getCurrentWeather(city);
-        })
-        .catch((error) => error);
-      input.value = '';
-      counter = 0;
-      btn.classList.toggle('right-btn-after-click');
-      btn.innerHTML = 'Choose location';
-    }
-  });
-  return right;
 }
 
-function leftContentRender() {
-  const left = document.createElement('div');
-  left.classList.add('left');
+function LeftRender(list) {
+  clearList(left);
   const leftTop = document.createElement('div');
   leftTop.classList.add('left-top');
   const dayDate = document.createElement('div');
   dayDate.classList.add('dayDate');
   const day = document.createElement('div');
   day.classList.add('day');
-  day.textContent = getDayFromDate(weatherLists[0].day1);
+  day.innerText = getDayFromDate(list.date);
   const date = document.createElement('div');
   date.classList.add('date');
-  date.textContent = currentDate();
-
-  const location = document.createElement('div');
-  location.classList.add('location');
-  location.textContent = `${weatherLists[0].country}, ${weatherLists[0].city}`;
-
-  const image = document.createElement('img');
-  image.classList.add('icon');
-  image.src = `${weatherLists[0].icon}`;
-  const leftBottom = document.createElement('div');
-  leftBottom.classList.add('left-bottom');
-  const leftTemp = document.createElement('div');
-  leftTemp.classList.add('left-temp');
-  leftTemp.textContent = `${weatherLists[0].temp}°C`;
+  date.innerText = formatDate(list.date);
+  const icon = document.createElement('img');
+  icon.src = list.icon;
+  icon.classList.add('icon');
+  const temp = document.createElement('div');
+  temp.classList.add('temp');
+  temp.innerText = `${list.temp}°C`;
   const condition = document.createElement('div');
   condition.classList.add('condition');
-  condition.textContent = `${weatherLists[0].condition}`;
+  condition.innerText = list.condition;
+  const location = document.createElement('div');
+  location.classList.add('location');
+  location.innerText = `${list.city}, ${list.country}`;
+  const leftBottom = document.createElement('div');
+  leftBottom.classList.add('left-bottom');
 
   dayDate.appendChild(day);
   dayDate.appendChild(date);
   leftTop.appendChild(dayDate);
   leftTop.appendChild(location);
-  leftBottom.appendChild(leftTemp);
+  leftBottom.appendChild(temp);
   leftBottom.appendChild(condition);
   left.appendChild(leftTop);
-  left.appendChild(image);
+  left.appendChild(icon);
   left.appendChild(leftBottom);
-  return left;
-}
-function renderWeather() {
-  clearList(board);
-  // ! start of right top
-  const right = rightContentRender();
-  const left = leftContentRender();
-  board.appendChild(right);
-  board.appendChild(left);
 }
 
-getCurrentWeather('dushanbe');
-getCurrentWeather(weatherLists[0].city);
+//
+getCurrentWeather('London');
+getCurrentWeather(weatherLists[0].full.city);
