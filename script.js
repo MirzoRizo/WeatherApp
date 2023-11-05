@@ -1,7 +1,5 @@
-const board = document.getElementById('weather');
 const cardHolder = document.querySelector('.other-days');
 const rightTop = document.querySelector('.right-top');
-const right = document.querySelector('.right');
 const btn = document.querySelector('.button');
 const input = document.getElementById('city');
 const left = document.querySelector('.left');
@@ -53,7 +51,7 @@ function getDayFromDate(dateInput) {
   const options = { weekday: 'long' };
   const day = date.toLocaleDateString('en-US', options);
 
-  return day.slice(0, 3);
+  return day;
 }
 
 async function getCurrentWeather(userInput) {
@@ -123,7 +121,7 @@ function renderCard() {
 
     dayChanger.id = list.id;
     dayChanger.classList.add('choose');
-    dayChanger.innerText = getDayFromDate(list.date);
+    dayChanger.innerText = getDayFromDate(list.date).slice(0, 3);
     const icon = document.createElement('img');
     icon.src = list.icon;
     icon.classList.add('right-icon');
@@ -191,7 +189,7 @@ function LeftRender(list) {
   icon.src = list.icon;
   icon.classList.add('icon');
   const temp = document.createElement('div');
-  temp.classList.add('temp');
+  temp.classList.add('left-temp');
   temp.innerText = `${list.temp}°C`;
   const condition = document.createElement('div');
   condition.classList.add('condition');
@@ -204,12 +202,14 @@ function LeftRender(list) {
 
   dayDate.appendChild(day);
   dayDate.appendChild(date);
+  dayDate.appendChild(location);
   leftTop.appendChild(dayDate);
-  leftTop.appendChild(location);
+  // leftTop.appendChild(location);
+  // leftTop.appendChild(icon); !icon from left side
   leftBottom.appendChild(temp);
   leftBottom.appendChild(condition);
   left.appendChild(leftTop);
-  left.appendChild(icon);
+  // left.appendChild(icon);
   left.appendChild(leftBottom);
 }
 
