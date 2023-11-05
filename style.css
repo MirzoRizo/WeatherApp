@@ -52,9 +52,10 @@ img {
   border-radius: 1.5rem;
 }
 .choose {
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
   align-items: center;
   justify-content: flex-end;
   height: 15rem;
@@ -62,6 +63,8 @@ img {
   font-size: 1.5rem;
   background-color: #252933;
   position: relative;
+  margin: 0.1rem;
+  border: 1px solid #252933;
 }
 
 .choosen {
@@ -80,9 +83,9 @@ img {
 
 .right-icon {
   position: absolute;
-  top: 0;
-  height: 100px;
-  width: 100px;
+  top: 2rem;
+  height: 80px;
+  width: 80px;
 }
 
 .temp {
@@ -107,11 +110,11 @@ img {
   font-size: 1.5rem;
   z-index: 0;
   box-shadow: 19px 19px 38px #171a20;
-  border: none;
+  border: 1px solid #ebb462;
 }
 
 #city:focus {
-  outline: none;
+  outline: 2px solid #ebb462;
 }
 
 .right-btn {
@@ -121,7 +124,6 @@ img {
   text-align: center;
   padding: 0.6rem;
   font-size: 1.5rem;
-  font-weight: bold;
   background-image: linear-gradient(
     90deg,
     #f0d471 0%,
@@ -175,11 +177,25 @@ img {
   font-weight: bold;
 }
 .left-temp {
-  font-size: 6rem;
+  font-size: 4rem;
   font-weight: bold;
   margin-bottom: 1rem;
 }
 .condition {
   font-size: 2rem;
   font-weight: bold;
+}
+.left-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.location {
+  margin-top: 1rem;
+}
+.icon {
+  width: 110px;
+  height: 110px;
+  background-color: rgba(33, 40, 50, 255);
+  border-radius: 1rem;
 }
