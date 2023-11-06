@@ -9,12 +9,16 @@ const loadingComponent = document.getElementById('loading');
 const API = '455bdd01213a436b9d195824230111';
 const LOCAL_STORAGE_WEATHER_KEY = 'weather.list';
 const LOCAL_STORAGE_SELECTED_LIST_ID_KEY = 'weather.selectedListId';
+const LOCAL_STORAGE_LOCATION_KEY = 'weather.location';
 let weatherLists = JSON.parse(
   localStorage.getItem(LOCAL_STORAGE_WEATHER_KEY) || '[]'
 );
 let selectedListId = localStorage.getItem(LOCAL_STORAGE_SELECTED_LIST_ID_KEY);
+let locationStorage = localStorage.getItem(LOCAL_STORAGE_LOCATION_KEY);
 const now = new Date();
 const currentHour = now.getHours();
+
+selectedListId = 0;
 
 let counter = 0;
 btn.addEventListener('click', (e) => {
@@ -24,7 +28,12 @@ btn.addEventListener('click', (e) => {
     btn.innerHTML = '<i class="fi fi-rr-search"></i>';
     counter = 1;
   } else {
-    getCurrentWeather(input.value);
+    if (input.value === '') {
+      return;
+    }
+    locationStorage = input.value;
+    getCurrentWeather(locationStorage);
+
     counter = 0;
     input.value = '';
     btn.classList.toggle('right-btn-after-click');
@@ -74,19 +83,19 @@ async function getCurrentWeather(userInput) {
     weatherLists = weatherLists.slice(-4);
     saveAndRender();
     setTimeout(
-      () => loadingComponentNone(),
+      () => loadingComponentDisplayNone(),
       Math.floor(Math.random() * (1500 - 300 + 1)) + 300
     );
   } catch (error) {
     alert('City not found');
     setTimeout(
-      () => loadingComponentNone(),
+      () => loadingComponentDisplayNone(),
       Math.floor(Math.random() * (1500 - 300 + 1)) + 300
     );
   }
 }
 
-function loadingComponentNone() {
+function loadingComponentDisplayNone() {
   loadingComponent.style.display = 'none';
 }
 
@@ -123,6 +132,7 @@ function clearList(element) {
 function save() {
   localStorage.setItem(LOCAL_STORAGE_WEATHER_KEY, JSON.stringify(weatherLists));
   localStorage.setItem(LOCAL_STORAGE_SELECTED_LIST_ID_KEY, selectedListId);
+  localStorage.setItem(LOCAL_STORAGE_LOCATION_KEY, locationStorage);
 }
 
 function saveAndRender() {
@@ -226,6 +236,24 @@ function LeftRender(list) {
   left.appendChild(leftBottom);
 }
 
-//
-getCurrentWeather('London');
-getCurrentWeather(weatherLists[0].full.city);
+const successCallback = async (position) => {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
+  );
+  // store response object
+  const data = await response.json();
+  const location = data.address.city;
+  if (locationStorage) return;
+  locationStorage = location;
+  localStorage.setItem(LOCAL_STORAGE_LOCATION_KEY, locationStorage);
+  getCurrentWeather(locationStorage);
+  console.log('succsec');
+};
+
+const errorCallback = (error) => {
+  alert("Can't find your location", error);
+};
+
+navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+getCurrentWeather(locationStorage);
+// !FInding User Location
