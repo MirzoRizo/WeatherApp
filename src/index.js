@@ -58,11 +58,7 @@ function getDayFromDate(dateInput) {
 }
 
 async function getCurrentWeather(userInput) {
-  if (userInput === weatherLists[0].full.city || !userInput) {
-    loadingComponent.style.display = 'none';
-  } else {
-    loadingComponent.style.display = 'block';
-  }
+  loadingComponent.style.display = 'block';
   try {
     const weather = await fetch(
       `https://api.weatherapi.com/v1/forecast.json?key=${API}&q=${userInput}&days=4&hour=${currentHour}`,
