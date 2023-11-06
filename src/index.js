@@ -1,8 +1,11 @@
+import './style.css';
+
 const cardHolder = document.querySelector('.other-days');
 const rightTop = document.querySelector('.right-top');
 const btn = document.querySelector('.button');
 const input = document.getElementById('city');
 const left = document.querySelector('.left');
+const loadingComponent = document.getElementById('loading');
 const API = '455bdd01213a436b9d195824230111';
 const LOCAL_STORAGE_WEATHER_KEY = 'weather.list';
 const LOCAL_STORAGE_SELECTED_LIST_ID_KEY = 'weather.selectedListId';
@@ -55,13 +58,18 @@ function getDayFromDate(dateInput) {
 }
 
 async function getCurrentWeather(userInput) {
+  if (userInput === weatherLists[0].full.city || !userInput) {
+    loadingComponent.style.display = 'none';
+  } else {
+    loadingComponent.style.display = 'block';
+  }
   try {
     const weather = await fetch(
       `https://api.weatherapi.com/v1/forecast.json?key=${API}&q=${userInput}&days=4&hour=${currentHour}`,
       { mode: 'cors' }
     );
     const weatherJson = await weather.json();
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i += 1) {
       const list = createList(weatherJson, i);
       const fullList = createFull(weatherJson, i);
       list.full = fullList;
@@ -69,9 +77,21 @@ async function getCurrentWeather(userInput) {
     }
     weatherLists = weatherLists.slice(-4);
     saveAndRender();
+    setTimeout(
+      () => loadingComponentNone(),
+      Math.floor(Math.random() * (1500 - 300 + 1)) + 300
+    );
   } catch (error) {
     alert('City not found');
+    setTimeout(
+      () => loadingComponentNone(),
+      Math.floor(Math.random() * (1500 - 300 + 1)) + 300
+    );
   }
+}
+
+function loadingComponentNone() {
+  loadingComponent.style.display = 'none';
 }
 
 function createList(Json, num) {
@@ -204,12 +224,9 @@ function LeftRender(list) {
   dayDate.appendChild(date);
   dayDate.appendChild(location);
   leftTop.appendChild(dayDate);
-  // leftTop.appendChild(location);
-  // leftTop.appendChild(icon); !icon from left side
   leftBottom.appendChild(temp);
   leftBottom.appendChild(condition);
   left.appendChild(leftTop);
-  // left.appendChild(icon);
   left.appendChild(leftBottom);
 }
 
