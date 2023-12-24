@@ -18,7 +18,9 @@ let locationStorage = localStorage.getItem(LOCAL_STORAGE_LOCATION_KEY);
 const now = new Date();
 const currentHour = now.getHours();
 
-selectedListId = 0;
+if (selectedListId === null) {
+  selectedListId = 0;
+}
 
 let counter = 0;
 btn.addEventListener('click', (e) => {
