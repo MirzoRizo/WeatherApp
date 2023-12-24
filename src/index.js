@@ -74,13 +74,13 @@ async function getCurrentWeather(userInput) {
       { mode: 'cors' }
     );
     const weatherJson = await weather.json();
-    for (let i = 0; i < 4; i += 1) {
+    for (let i = 0; i < 3; i += 1) {
       const list = createList(weatherJson, i);
       const fullList = createFull(weatherJson, i);
       list.full = fullList;
       weatherLists.push(list);
     }
-    weatherLists = weatherLists.slice(-4);
+    weatherLists = weatherLists.slice(-3);
     saveAndRender();
     setTimeout(
       () => loadingComponentDisplayNone(),
@@ -253,7 +253,6 @@ const successCallback = async (position) => {
 const errorCallback = (error) => {
   alert("Can't find your location", error);
 };
-
 navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 getCurrentWeather(locationStorage);
 // !FInding User Location
