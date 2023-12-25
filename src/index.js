@@ -7,6 +7,7 @@ const input = document.getElementById('city');
 const left = document.querySelector('.left');
 const loadingComponent = document.getElementById('loading');
 const API = '455bdd01213a436b9d195824230111';
+const UnsplashAPI = 'FfbYgIAQmFpgds-JZWM7SCPGNxhkB3TbEXuUtJO0ebE';
 const LOCAL_STORAGE_WEATHER_KEY = 'weather.list';
 const LOCAL_STORAGE_SELECTED_LIST_ID_KEY = 'weather.selectedListId';
 const LOCAL_STORAGE_LOCATION_KEY = 'weather.location';
@@ -67,7 +68,6 @@ function getDayFromDate(dateInput) {
 
   return day;
 }
-
 async function getCurrentWeather(userInput) {
   loadingComponent.style.display = 'block';
   try {
@@ -83,22 +83,18 @@ async function getCurrentWeather(userInput) {
       weatherLists.push(list);
     }
     weatherLists = weatherLists.slice(-3);
+    getPic(userInput);
     saveAndRender();
-    setTimeout(
-      () => loadingComponentDisplayNone(),
-      Math.floor(Math.random() * (1500 - 300 + 1)) + 300
-    );
+    // loadingComponentDisplayNone();
   } catch (error) {
     alert('City not found');
-    setTimeout(
-      () => loadingComponentDisplayNone(),
-      Math.floor(Math.random() * (1500 - 300 + 1)) + 300
-    );
+    loadingComponentDisplayNone();
   }
 }
 
-function loadingComponentDisplayNone() {
-  loadingComponent.style.display = 'none';
+async function loadingComponentDisplayNone() {
+  loadingComponent.style.transition = 'all 0.5s ease-out';
+  loadingComponent.style.display = '';
 }
 
 function createList(Json, num) {
@@ -238,23 +234,76 @@ function LeftRender(list) {
   left.appendChild(leftBottom);
 }
 
+async function getPic(userInput) {
+  try {
+    const response = await fetch(
+      `https://api.unsplash.com/search/photos/?query=${userInput}&client_id=${UnsplashAPI}&orientation=portrait`
+    );
+    if (response.ok) {
+      const Data = await response.json();
+      const image = `${
+        Data.results[getRandomNumber(Data.results.length)].urls.full
+      }&w=540`;
+      load(image)
+        .then(() => {
+          left.style.backgroundImage = `url(${image})`;
+        })
+        .then(() => {
+          loadingComponentDisplayNone();
+        });
+    } else {
+      alert('Failed');
+    }
+    saveAndRender();
+  } catch (error) {
+    alert(error);
+  }
+}
+
 const successCallback = async (position) => {
-  const response = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
-  );
-  // store response object
-  const data = await response.json();
-  const location = data.address.city;
-  if (locationStorage) return;
-  locationStorage = location;
-  localStorage.setItem(LOCAL_STORAGE_LOCATION_KEY, locationStorage);
-  getCurrentWeather(locationStorage);
-  console.log('succsec');
+  if (!locationStorage) {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`
+    );
+    // store response object
+    const data = await response.json();
+    const location = data.address.city;
+    locationStorage = location;
+    localStorage.setItem(LOCAL_STORAGE_LOCATION_KEY, locationStorage);
+    getCurrentWeather(locationStorage);
+    console.log('succsec');
+  } else {
+    getCurrentWeather(locationStorage);
+  }
 };
 
 const errorCallback = (error) => {
-  alert("Can't find your location", error);
+  if (!locationStorage) {
+    alert(
+      "Can't find your location so we will show you Paris, plase give permission",
+      error
+    );
+    getCurrentWeather('Paris');
+  } else {
+    getCurrentWeather('Paris');
+  }
 };
-navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-getCurrentWeather(locationStorage);
 // !FInding User Location
+navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+
+function getRandomNumber(length) {
+  return Math.floor(Math.random() * length);
+}
+// left.addEventListener('load', () => {
+//   loadingComponentDisplayNone();
+//   console.log('window loaded');
+// });
+
+function load(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', resolve);
+    image.addEventListener('error', reject);
+    image.src = src;
+  });
+}
