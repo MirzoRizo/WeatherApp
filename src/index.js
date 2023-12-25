@@ -285,7 +285,7 @@ const errorCallback = (error) => {
     );
     getCurrentWeather('Paris');
   } else {
-    getCurrentWeather('Paris');
+    getCurrentWeather(locationStorage);
   }
 };
 // !FInding User Location
