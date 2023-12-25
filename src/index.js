@@ -256,7 +256,8 @@ async function getPic(userInput) {
     }
     saveAndRender();
   } catch (error) {
-    alert(error);
+    console.log("Can't find image(");
+    loadingComponentDisplayNone();
   }
 }
 
@@ -280,8 +281,7 @@ const successCallback = async (position) => {
 const errorCallback = (error) => {
   if (!locationStorage) {
     alert(
-      "Can't find your location so we will show you Paris, plase give permission",
-      error
+      "Can't find your location so we will show you Paris, plase give permission"
     );
     getCurrentWeather('Paris');
   } else {
