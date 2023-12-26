@@ -3,39 +3,62 @@
   padding: 0;
   box-sizing: border-box;
   scroll-behavior: smooth;
+  font-family: Inter, arial, san-serif;
 }
 html {
-  font-family: Inter, arial, san-sarif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  transition: all 0.5s ease-in-out;
+  width: 100%;
   overflow: hidden;
+  background-color: #002f8775;
 }
 
 #weather {
-  width: 75rem;
-  height: 40rem;
+  max-width: 70rem;
+  min-width: 650px;
+  width: clamp(40rem, 90vw, 70rem);
+  min-height: 41rem;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(33, 40, 50, 255);
+  border-radius: 2rem;
 }
 
-img {
-  width: 200px;
-  height: 200px;
-}
 .right {
-  background-color: rgba(33, 40, 50, 255);
   color: #fff;
-  width: 55%;
-  height: 40rem;
-  float: right;
   padding: 4rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border-radius: 0 2rem 2rem 0;
   position: relative;
+  width: clamp(25rem, 60vw, 42rem);
+  height: 40rem;
 }
+
+.left {
+  width: clamp(20.5rem, 40vw, 28rem);
+  height: 40rem;
+  padding: 3rem;
+  margin-left: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 1.5rem;
+  border: 1px rgba(37, 47, 83, 0.842) solid;
+  border-radius: 1.5rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: rgba(33, 40, 50, 0.6);
+  background-blend-mode: darken;
+  /* background-attachment: fixed; */
+  box-shadow: 25px 5px 20px -10px #171a20;
+  transition: transform 0.2s;
+}
+
 .right-top > div {
   display: flex;
   align-items: center;
@@ -85,8 +108,8 @@ img {
 .right-icon {
   position: absolute;
   top: 2rem;
-  height: 80px;
-  width: 80px;
+  height: 5rem;
+  width: 5rem;
 }
 
 .temp {
@@ -107,8 +130,8 @@ img {
   width: 100%;
   padding: 0.6rem;
   padding-left: 1rem;
-  border-radius: 1.5rem;
-  font-size: 1.5rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
   z-index: 0;
   box-shadow: 19px 19px 38px #171a20;
   border: 1px solid #ebb462;
@@ -120,57 +143,39 @@ img {
 
 .right-btn {
   color: #fff;
-  width: 33.3rem;
-  border-radius: 1.5rem;
-  text-align: center;
-  padding: 0.6rem;
-  font-size: 1.5rem;
+  width: 3rem;
+  font-size: 1rem;
   background-image: linear-gradient(
     90deg,
     #f0d471 0%,
     #ebb462 35%,
     #e79f57 100%
   );
-
-  position: fixed;
-  transition: all 0.3s ease-in-out;
+  position: absolute;
   border: none;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  height: 2.5rem;
+  border-radius: 30%;
 }
 
 .right-btn:hover {
   cursor: pointer;
 }
 
-.right-btn-after-click {
-  width: 4rem;
-}
+/* .right-btn-after-click {
+  width: 5rem;
+  transition: all 0.3s ease-in-out;
+} */
 
 .search-icon {
   visibility: hidden;
 }
 
-.left {
-  height: 40rem;
-  padding: 3rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 1.5rem;
-  border-radius: 2rem;
-  transform: scale(1.03);
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: rgba(0, 0, 0, 0.33);
-  background-blend-mode: darken;
-  box-shadow: 25px 5px 20px -10px #171a20;
-}
 .dayDate,
 .left-temp,
-.condition {
+.condition,
+.humidity,
+.wind,
+.feelslike {
   background-image: linear-gradient(
     45deg,
     #f0d471 0%,
@@ -179,6 +184,7 @@ img {
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .dayDate {
   margin-bottom: 1rem;

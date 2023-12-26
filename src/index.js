@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import './style.css';
 
 const cardHolder = document.querySelector('.other-days');
@@ -23,26 +24,16 @@ if (selectedListId === null) {
   selectedListId = 0;
 }
 
-let counter = 0;
 btn.addEventListener('click', (e) => {
   e.preventDefault();
-  if (!counter) {
-    btn.classList.toggle('right-btn-after-click');
-    btn.innerHTML = '<i class="fi fi-rr-search"></i>';
-    counter = 1;
-  } else {
-    if (input.value === '') {
-      return;
-    }
-    locationStorage = input.value;
-    getCurrentWeather(locationStorage);
-
-    counter = 0;
-    input.value = '';
-    btn.classList.toggle('right-btn-after-click');
-    btn.innerHTML = 'Choose location';
-    selectedListId = 0;
+  if (input.value === '') {
+    return;
   }
+  locationStorage = input.value;
+  getCurrentWeather(locationStorage);
+
+  input.value = '';
+  selectedListId = 0;
 });
 
 cardHolder.addEventListener('click', (e) => {
@@ -272,7 +263,7 @@ const successCallback = async (position) => {
     locationStorage = location;
     localStorage.setItem(LOCAL_STORAGE_LOCATION_KEY, locationStorage);
     getCurrentWeather(locationStorage);
-    console.log('succsec');
+    console.log('success');
   } else {
     getCurrentWeather(locationStorage);
   }
@@ -281,7 +272,8 @@ const successCallback = async (position) => {
 const errorCallback = (error) => {
   if (!locationStorage) {
     alert(
-      "Can't find your location so we will show you Paris, plase give permission"
+      "Can't find your location so we will show you Paris, please give permission",
+      error
     );
     getCurrentWeather('Paris');
   } else {
@@ -307,3 +299,28 @@ function load(src) {
     image.src = src;
   });
 }
+
+let defaultTransform = '';
+
+left.addEventListener('mouseover', () => {
+  defaultTransform = left.style.transform;
+  left.style.transform = '';
+});
+
+left.addEventListener('mousemove', (e) => {
+  const rect = left.getBoundingClientRect();
+  const xCenter = rect.left + rect.width / 2;
+  const yCenter = rect.top + rect.height / 2;
+
+  const dx = e.clientX - xCenter;
+  const dy = e.clientY - yCenter;
+
+  const tiltX = (dy / rect.height) * -10;
+  const tiltY = (dx / rect.width) * 20;
+
+  left.style.transform = `${defaultTransform} perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.1)`;
+});
+
+left.addEventListener('mouseout', () => {
+  left.style.transform = defaultTransform;
+});
