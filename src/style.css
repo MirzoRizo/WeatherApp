@@ -72,8 +72,11 @@ html {
 }
 .other-days {
   display: flex;
-  box-shadow: 19px 19px 38px #171a20;
+  filter: drop-shadow(19px 19px 38px #171a20);
   border-radius: 1.5rem;
+}
+.right-bottom {
+  background-color: transparent;
 }
 .choose {
   border-radius: 1rem;
@@ -88,21 +91,22 @@ html {
   background-color: #252933;
   position: relative;
   margin: 0.1rem;
-  border: 1px solid #252933;
+  border: 1px rgba(24, 31, 53, 0.527) solid;
 }
 
 .choosen {
   background-color: #fff;
   color: black;
+  border: none;
 }
 
 .choose:hover {
   background-color: #fff;
   color: black;
   cursor: pointer;
-  transform: scale(1.1);
   transition: 0.3s ease-in-out;
   z-index: 2;
+  transform: scale(1.04);
 }
 
 .right-icon {
@@ -134,11 +138,12 @@ html {
   font-size: 1rem;
   z-index: 0;
   box-shadow: 19px 19px 38px #171a20;
-  border: 1px solid #ebb462;
+  border: 1px solid transparent;
 }
 
 #city:focus {
-  outline: 2px solid #ebb462;
+  /* outline: 1.2px solid #ebb462; */
+  outline: 1.5px solid #ebb462;
 }
 
 .right-btn {
@@ -155,10 +160,13 @@ html {
   border: none;
   height: 2.5rem;
   border-radius: 30%;
+  transform: scale(1.1);
+  transition: 0.3s ease-in-out;
 }
 
 .right-btn:hover {
   cursor: pointer;
+  transform: scale(1.2);
 }
 
 /* .right-btn-after-click {
