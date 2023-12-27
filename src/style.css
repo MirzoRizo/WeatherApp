@@ -51,6 +51,7 @@ html {
   border: 1px rgba(37, 47, 83, 0.842) solid;
   border-radius: 1.5rem;
   background-position: center;
+  background-size: cover;
   background-repeat: no-repeat;
   background-color: rgba(33, 40, 50, 0.6);
   background-blend-mode: darken;
@@ -108,7 +109,6 @@ html {
   z-index: 2;
   transform: scale(1.04);
 }
-
 .right-icon {
   position: absolute;
   top: 2rem;
